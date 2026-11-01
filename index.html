@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Про-Пуск</title>
+<meta name="theme-color" content="#078f95">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{min-height:100vh;color:#fff;font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+       background:linear-gradient(135deg,#00d6e2 0%,#078f95 55%,#05484c 100%);
+       display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;text-align:center}
+  .ring{width:120px;height:120px;border:6px solid #fff;border-radius:50%;position:relative;margin:0 auto 22px}
+  .ring:after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;background:#fff;border-radius:50%}
+  h1{margin:0;line-height:0}
+  h1 svg{height:34px;width:auto}
+  .tag{opacity:.85;margin:10px 0 28px;letter-spacing:.3em;font-size:12px;text-transform:uppercase}
+  .btn{display:inline-block;background:#fff;color:#066f74;text-decoration:none;font-weight:600;font-size:17px;
+       border:0;border-radius:14px;padding:15px 26px;margin:6px;min-width:250px;cursor:pointer}
+  .btn.ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.8)}
+  .card{max-width:380px;margin:26px auto 0;background:rgba(0,0,0,.18);border-radius:16px;padding:16px 18px;text-align:left;font-size:15px}
+  .card b{display:block;margin-bottom:6px}
+  .card ol{margin:0;padding-left:20px}
+  .card li{margin:4px 0}
+  #go{display:none}
+  .standalone #home{display:none}
+  .standalone #go{display:block}
+</style>
+<script>
+  // Адрес приложения отметки (Google Apps Script)
+  var APP_URL = 'https://script.google.com/macros/s/AKfycbwG6vbw5tCfqa4ycmXFnU65SQkzAbDvcFDoME7Zk4DCBGjaB1XTzoOHmI1aNVu4alXXFw/exec';
+  var standalone = /[?&]app=1/.test(location.search) ||
+                   (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+  if (standalone) { document.documentElement.className = 'standalone'; location.replace(APP_URL); }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+</head>
+<body>
+  <div class="ring"></div>
+  <h1 aria-label="Про-Пуск">
+    <svg viewBox="0 0 256 40" fill="none" stroke="#fff" stroke-width="3.6">
+      <path d="M2,38 V2 H24 V38"/>
+      <path d="M34,38 V2 H47 A9,9 0 0 1 47,20 H34"/>
+      <circle cx="84" cy="20" r="18.2"/><circle cx="84" cy="20" r="3.4" fill="#fff" stroke="none"/>
+      <path d="M112,20 H124"/>
+      <path d="M134,38 V2 H156 V38"/>
+      <path d="M166,2 L177,22 M188,2 L171,38"/>
+      <path d="M220,2 H216 A18,18 0 0 0 216,38 H220"/>
+      <path d="M232,2 V38 M254,2 L236,20 L254,38"/>
+    </svg>
+  </h1>
+  <div class="tag">утренняя отметка · Пространство</div>
+
+  <div id="go">Открываю отметку…</div>
+
+  <div id="home">
+    <button class="btn" id="install" style="display:none">Установить на телефон</button><br>
+    <a class="btn ghost" id="open" href="#">Открыть отметку</a>
+
+    <div class="card" id="howto">
+      <b>Как поставить иконку на главный экран</b>
+      <ol>
+        <li>Откройте эту страницу в Chrome (не внутри Telegram: «⋯» → «Открыть в браузере»).</li>
+        <li>Нажмите <b style="display:inline">⋮</b> вверху справа.</li>
+        <li>Выберите «Установить приложение» или «Добавить на главный экран».</li>
+      </ol>
+    </div>
+  </div>
+
+<script>
+  document.getElementById('open').href = APP_URL;
+  var deferred = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault(); deferred = e;
+    document.getElementById('install').style.display = 'inline-block';
+  });
+  document.getElementById('install').onclick = function () {
+    if (!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.finally(function(){ deferred = null; document.getElementById('install').style.display = 'none'; });
+  };
+  window.addEventListener('appinstalled', function () {
+    document.getElementById('howto').innerHTML = '<b>Готово!</b>Иконка «Про-Пуск» появилась на главном экране. Открывайте отметку с неё.';
+  });
+</script>
+</body>
+</html>
